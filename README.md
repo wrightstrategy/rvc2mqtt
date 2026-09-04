@@ -54,7 +54,7 @@ The bridge can decode and publish data for:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/rvc2mqtt.git
+   git clone https://github.com/wrightstrategy/rvc2mqtt.git
    cd rvc2mqtt
    ```
 
