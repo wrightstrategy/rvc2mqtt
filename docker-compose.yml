@@ -3,7 +3,7 @@ version: '3.8'
 services:
   rvc2mqtt:
     # Use pre-built image from GitHub Container Registry (recommended)
-    image: ghcr.io/rv10guy/rvc2mqtt:latest
+    image: ghcr.io/wrightstrategy/rvc2mqtt:latest
 
     # OR: Build locally (uncomment to build from source)
     # build:

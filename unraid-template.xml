@@ -1,19 +1,19 @@
 <?xml version="1.0"?>
 <Container version="2">
   <Name>rvc2mqtt</Name>
-  <Repository>ghcr.io/rv10guy/rvc2mqtt:latest</Repository>
-  <Registry>https://ghcr.io/rv10guy/rvc2mqtt</Registry>
+  <Repository>ghcr.io/wrightstrategy/rvc2mqtt:latest</Repository>
+  <Registry>https://ghcr.io/wrightstrategy/rvc2mqtt</Registry>
   <Network>host</Network>
   <MyIP/>
   <Shell>sh</Shell>
   <Privileged>false</Privileged>
-  <Support>https://github.com/rv10guy/rvc2mqtt/issues</Support>
-  <Project>https://github.com/rv10guy/rvc2mqtt</Project>
+  <Support>https://github.com/wrightstrategy/rvc2mqtt/issues</Support>
+  <Project>https://github.com/wrightstrategy/rvc2mqtt</Project>
   <Overview>RV-C to MQTT bridge with Home Assistant Discovery. Provides bidirectional communication between RV-C CAN bus and Home Assistant via MQTT, enabling monitoring and control of RV systems (lights, HVAC, tanks, batteries, etc.).</Overview>
   <Category>HomeAutomation:</Category>
   <WebUI/>
-  <TemplateURL>https://raw.githubusercontent.com/rv10guy/rvc2mqtt/master/unraid-template.xml</TemplateURL>
-  <Icon>https://raw.githubusercontent.com/rv10guy/rvc2mqtt/master/docs/icon.png</Icon>
+  <TemplateURL>https://raw.githubusercontent.com/wrightstrategy/rvc2mqtt/main/unraid-template.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/wrightstrategy/rvc2mqtt/main/docs/icon.png</Icon>
   <ExtraParams>--restart=unless-stopped</ExtraParams>
   <PostArgs/>
   <CPUset/>

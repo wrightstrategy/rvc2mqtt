@@ -18,7 +18,7 @@ This guide covers deploying rvc2mqtt in a Docker container. The Docker deploymen
 
 ### 1. Clone Repository
 ```bash
-git clone https://github.com/rv10guy/rvc2mqtt.git
+git clone https://github.com/wrightstrategy/rvc2mqtt.git
 cd rvc2mqtt
 ```
 
@@ -450,7 +450,7 @@ Best practices for securing MQTT credentials:
 2. **Copy files to Docker host**
    ```bash
    # On Docker host
-   git clone https://github.com/rv10guy/rvc2mqtt.git
+   git clone https://github.com/wrightstrategy/rvc2mqtt.git
    cd rvc2mqtt
 
    # Copy your customized config
@@ -518,7 +518,7 @@ docker-compose restart
 ### Major Updates (Code Changes)
 ```bash
 # Pull latest code
-git pull origin master
+git pull origin main
 
 # Rebuild image
 docker-compose build
@@ -603,7 +603,7 @@ docker volume prune            # Remove unused volumes
 ```
 
 ### Getting Help
-- GitHub Issues: https://github.com/rv10guy/rvc2mqtt/issues
+- GitHub Issues: https://github.com/wrightstrategy/rvc2mqtt/issues
 - Documentation: docs/ directory
 - Logs: Check logs/ and audit/ directories
 
