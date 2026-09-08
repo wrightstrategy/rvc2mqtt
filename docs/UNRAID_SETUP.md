@@ -10,7 +10,7 @@ Quick guide for installing rvc2mqtt on Unraid using the Docker template.
    - In Unraid: Go to Docker tab
    - Click "Add Container" button at bottom
    - Click "Template repositories" at top
-   - Add: `https://raw.githubusercontent.com/rv10guy/rvc2mqtt/master/unraid-template.xml`
+   - Add: `https://raw.githubusercontent.com/wrightstrategy/rvc2mqtt/main/unraid-template.xml`
 
 2. **Select Template**
    - Under "Template", search for: `rvc2mqtt`
@@ -26,7 +26,7 @@ Quick guide for installing rvc2mqtt on Unraid using the Docker template.
 
    # Clone repo to get config files
    cd /tmp
-   git clone https://github.com/rv10guy/rvc2mqtt.git
+   git clone https://github.com/wrightstrategy/rvc2mqtt.git
 
    # Copy config files to appdata
    cp /tmp/rvc2mqtt/rvc2mqtt.ini /mnt/user/appdata/rvc2mqtt/
@@ -85,7 +85,7 @@ mkdir -p /mnt/user/appdata/rvc2mqtt/{logs,audit,mappings}
 cd /mnt/user/appdata/rvc2mqtt
 
 # Get config files
-git clone https://github.com/rv10guy/rvc2mqtt.git temp
+git clone https://github.com/wrightstrategy/rvc2mqtt.git temp
 cp temp/rvc2mqtt.ini .
 cp temp/rvc-spec.yml .
 cp -r temp/mappings/* mappings/
@@ -139,7 +139,7 @@ You can override config file settings via Unraid template environment variables:
 
 2. **Via Command Line**
    ```bash
-   docker pull ghcr.io/rv10guy/rvc2mqtt:latest
+   docker pull ghcr.io/wrightstrategy/rvc2mqtt:latest
    docker stop rvc2mqtt
    docker rm rvc2mqtt
    # Then recreate via Unraid GUI or docker-compose up -d
@@ -243,8 +243,8 @@ tar -xzf rvc2mqtt-backup-YYYYMMDD.tar.gz -C /
 
 ## Support
 
-- **GitHub Issues**: https://github.com/rv10guy/rvc2mqtt/issues
-- **Documentation**: https://github.com/rv10guy/rvc2mqtt/tree/master/docs
+- **GitHub Issues**: https://github.com/wrightstrategy/rvc2mqtt/issues
+- **Documentation**: https://github.com/wrightstrategy/rvc2mqtt/tree/main/docs
 - **Unraid Forums**: Community support (coming soon)
 
 ## Architecture
@@ -255,7 +255,7 @@ tar -xzf rvc2mqtt-backup-YYYYMMDD.tar.gz -C /
 │                                          │
 │  ┌────────────────────────────────────┐ │
 │  │ rvc2mqtt Docker Container          │ │
-│  │ (ghcr.io/rv10guy/rvc2mqtt:latest) │ │
+│  │ (ghcr.io/wrightstrategy/rvc2mqtt:latest) │ │
 │  │                                    │ │
 │  │ Connects to:                       │ │
 │  │ • ESP32 SLCAN (192.168.x.x:3333)  │ │
