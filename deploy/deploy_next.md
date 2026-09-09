@@ -4,6 +4,9 @@
 
 - When: with the new image.
 - Tiers: existing Docker/Compose installations, including rv-server.
+- Progress: rv-server completed on 2026-09-08 via homelab PR #2062; verified running
+  without a healthcheck and publishing fresh RV state. The steps below still apply
+  to other existing installations.
 - Do: remove deployment-level copies of the `pgrep` healthcheck and recreate the
   container using the new image. For the example Compose deployment, use the updated
   `docker-compose.yml`, then `docker compose pull && docker compose up -d`.
