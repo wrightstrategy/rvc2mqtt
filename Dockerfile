@@ -27,6 +27,11 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# setuptools is build tooling, not a runtime dependency. Remove its vendored
+# packages after installation; uv is mounted only for this build step.
+RUN --mount=from=ghcr.io/astral-sh/uv:0.12.11@sha256:79c6f4776b851471cc73b7d21d0cc834bb94383c292e83640d27eff512864df7,source=/uv,target=/bin/uv \
+    uv pip uninstall --system setuptools && uv pip check --system
+
 # Copy application files
 COPY rvc2mqtt.py .
 COPY ha_discovery.py .

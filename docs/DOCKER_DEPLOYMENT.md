@@ -59,6 +59,10 @@ docker-compose logs -f
 
 ### Building the Docker Image
 
+Source builds require Docker BuildKit for the temporary build-tool mount. Use
+Docker Compose v2 (`docker compose`) or `docker buildx build`. For legacy
+`docker-compose`, enable it with `DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1`.
+
 #### Option 1: Using Docker Compose (Recommended)
 ```bash
 docker-compose build
@@ -378,6 +382,8 @@ docker inspect rvc2mqtt --format '{{.State.Status}}'
 ```
 
 The image and example Compose configuration intentionally have no Docker healthcheck.
+The runtime image also omits setuptools and its vendored build tools after dependency
+installation; the image build checks that all installed runtime dependencies remain satisfied.
 Python runs as the container's foreground process; Docker reports when it exits, and
 the configured restart policy handles restarts. The former `pgrep` check depended on
 a missing executable and could only establish that the process existed.
