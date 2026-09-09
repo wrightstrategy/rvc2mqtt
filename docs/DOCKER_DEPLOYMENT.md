@@ -398,7 +398,7 @@ old healthcheck. A restart alone keeps the old container configuration. Confirm 
 replacement has no health state:
 
 ```bash
-docker inspect rvc2mqtt --format '{{json .State.Health}}'
+docker inspect rvc2mqtt --format '{{json (index .State "Health")}}'
 # Expected: null
 ```
 

@@ -4,6 +4,9 @@
 
 - When: with the new image.
 - Tiers: existing Docker/Compose installations, including rv-server.
+- Progress: rv-server completed on 2026-09-08 via homelab PR #2062; verified running
+  without a healthcheck and publishing fresh RV state. The steps below still apply
+  to other existing installations.
 - Do: remove deployment-level copies of the `pgrep` healthcheck and recreate the
   container using the new image. For the example Compose deployment, use the updated
   `docker-compose.yml`, then `docker compose pull && docker compose up -d`.
@@ -12,7 +15,7 @@
   `ghcr.io/wrightstrategy/rvc2mqtt` image digest through the homelab deployment
   workflow. Before that cutover, verify registry pull access and compatibility with
   the existing application configuration and mappings.
-- Verify: `docker inspect rvc2mqtt --format '{{json .State.Health}}'` returns `null`,
+- Verify: `docker inspect rvc2mqtt --format '{{json (index .State "Health")}}'` returns `null`,
   the container remains running, and fresh RV state updates still reach Home
   Assistant. Check the separate MQTT prober as broker-path evidence only.
 - Why: the old process probe cannot pass and does not measure bridge functionality;
