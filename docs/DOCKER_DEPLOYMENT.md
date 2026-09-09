@@ -378,6 +378,8 @@ docker inspect rvc2mqtt --format '{{.State.Status}}'
 ```
 
 The image and example Compose configuration intentionally have no Docker healthcheck.
+The runtime image also omits setuptools and its vendored build tools after dependency
+installation; the image build checks that all installed runtime dependencies remain satisfied.
 Python runs as the container's foreground process; Docker reports when it exits, and
 the configured restart policy handles restarts. The former `pgrep` check depended on
 a missing executable and could only establish that the process existed.
