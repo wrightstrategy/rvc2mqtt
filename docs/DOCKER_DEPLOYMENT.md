@@ -59,6 +59,10 @@ docker-compose logs -f
 
 ### Building the Docker Image
 
+Source builds require Docker BuildKit for the temporary build-tool mount. Use
+Docker Compose v2 (`docker compose`) or `docker buildx build`. For legacy
+`docker-compose`, enable it with `DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1`.
+
 #### Option 1: Using Docker Compose (Recommended)
 ```bash
 docker-compose build
