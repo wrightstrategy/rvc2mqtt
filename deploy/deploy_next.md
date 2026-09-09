@@ -1,6 +1,6 @@
 # Pending deployment steps
 
-## Remove the obsolete container healthcheck (PLT-352)
+## Remove the obsolete container healthcheck (PLT-352, PR #26)
 
 - When: with the new image.
 - Tiers: existing Docker/Compose installations, including rv-server.
