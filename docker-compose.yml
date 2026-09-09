@@ -45,14 +45,6 @@ services:
       # Audit logs directory (read-write for persistence)
       - ./audit:/app/audit
 
-    # Health check
-    healthcheck:
-      test: ["CMD", "pgrep", "-f", "rvc2mqtt.py"]
-      interval: 60s
-      timeout: 10s
-      start_period: 30s
-      retries: 3
-
     # Logging configuration
     logging:
       driver: "json-file"
