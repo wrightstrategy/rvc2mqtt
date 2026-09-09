@@ -12,7 +12,7 @@
   `ghcr.io/wrightstrategy/rvc2mqtt` image digest through the homelab deployment
   workflow. Before that cutover, verify registry pull access and compatibility with
   the existing application configuration and mappings.
-- Verify: `docker inspect rvc2mqtt --format '{{json .State.Health}}'` returns `null`,
+- Verify: `docker inspect rvc2mqtt --format '{{json (index .State "Health")}}'` returns `null`,
   the container remains running, and fresh RV state updates still reach Home
   Assistant. Check the separate MQTT prober as broker-path evidence only.
 - Why: the old process probe cannot pass and does not measure bridge functionality;
