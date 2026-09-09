@@ -55,9 +55,5 @@ RUN mkdir -p /app/logs /app/audit && \
 # Run as nobody:users (99:100) - Unraid standard
 USER 99:100
 
-# Health check (optional - check if process is running)
-HEALTHCHECK --interval=60s --timeout=10s --start-period=30s --retries=3 \
-    CMD pgrep -f rvc2mqtt.py || exit 1
-
 # Entry point
 CMD ["python", "-u", "rvc2mqtt.py"]

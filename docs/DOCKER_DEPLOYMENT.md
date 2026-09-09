@@ -373,8 +373,27 @@ docker stats rvc2mqtt
 # Real-time stats
 docker stats rvc2mqtt
 
-# Check health status
-docker inspect rvc2mqtt | grep -A 5 Health
+# Check container state
+docker inspect rvc2mqtt --format '{{.State.Status}}'
+```
+
+The image and example Compose configuration intentionally have no Docker healthcheck.
+Python runs as the container's foreground process; Docker reports when it exits, and
+the configured restart policy handles restarts. The former `pgrep` check depended on
+a missing executable and could only establish that the process existed.
+
+`running` does not prove that CAN messages reach MQTT or Home Assistant. Verify fresh
+RV state updates in Home Assistant when checking the bridge. A separate MQTT
+publish/receive probe can verify broker connectivity, but does not exercise the CAN
+reader or the bridge's message processing.
+
+After upgrading, recreate the container and remove any deployment-level copy of the
+old healthcheck. A restart alone keeps the old container configuration. Confirm the
+replacement has no health state:
+
+```bash
+docker inspect rvc2mqtt --format '{{json .State.Health}}'
+# Expected: null
 ```
 
 ### Application Metrics
