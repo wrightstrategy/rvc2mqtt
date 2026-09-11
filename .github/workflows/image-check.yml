@@ -1,0 +1,97 @@
+name: Test and scan image
+
+on:
+  workflow_call:
+    inputs:
+      publish:
+        required: true
+        type: boolean
+
+jobs:
+  verify:
+    # Public/fork code cannot use the organization's private runner pool.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      IMAGE: ghcr.io/${{ github.repository }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        with:
+          version: '0.12.11'
+          enable-cache: false
+      - name: Install checksum-verified secret scanner
+        run: bash ci/install-gitleaks.sh
+      - name: Configuration and publishing tests
+        run: bash ci/check.sh
+      - uses: docker/setup-qemu-action@1f40c72289eff860ee54a304f1438e3cff362e0a # v4.3.0
+        if: inputs.publish
+        with:
+          platforms: arm64
+      - uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+      - name: Verify promotion against a disposable registry
+        run: python3 ci/test-image-promotion.py
+      - uses: aquasecurity/setup-trivy@81e514348e19b6112ce2a7e3ecbafe19c1e1f567 # v0.3.1
+        with:
+          version: v0.74.0
+          cache: false
+      - uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        id: meta
+        with:
+          images: ${{ env.IMAGE }}
+          tags: type=sha,format=long
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        if: inputs.publish
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Build PR image without publishing
+        if: ${{ !inputs.publish }}
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: .
+          platforms: linux/amd64
+          load: true
+          tags: rvc2mqtt:ci
+          labels: ${{ steps.meta.outputs.labels }}
+      - name: Build candidate by digest
+        if: inputs.publish
+        id: build
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          provenance: mode=max
+          sbom: true
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=true
+      - name: Test the actual image and scan every published architecture
+        env:
+          PUBLISH: ${{ inputs.publish }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          set -euo pipefail
+          candidate=rvc2mqtt:ci
+          if [ "$PUBLISH" = true ]; then candidate="$IMAGE@$DIGEST"; fi
+          python3 ci/test-container-config.py "$candidate"
+          trivy image --scanners vuln --exit-code 1 --severity CRITICAL,HIGH --ignore-unfixed --platform linux/amd64 "$candidate"
+          if [ "$PUBLISH" = true ]; then
+            trivy image --scanners vuln --exit-code 1 --severity CRITICAL,HIGH --ignore-unfixed --platform linux/arm64 "$candidate"
+          fi
+      - name: Publish verified commit and edge tags
+        if: inputs.publish
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 ci/image_tags.py --immutable "$IMAGE@$DIGEST" "$IMAGE:sha-$GITHUB_SHA"
+          tip=$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)
+          if [ "$tip" = "$GITHUB_SHA" ]; then
+            python3 ci/image_tags.py "$IMAGE@$DIGEST" "$IMAGE:edge"
+          fi
+          printf 'Verified image: %s@%s\n' "$IMAGE" "$DIGEST" >> "$GITHUB_STEP_SUMMARY"

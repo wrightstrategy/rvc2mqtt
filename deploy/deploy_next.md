@@ -38,3 +38,19 @@
   rv-server must receive the managed mount and verified image digest together through
   homelab PLT-260. Roll back the previous image/configuration pair if cutover fails.
   Removing the new image's configuration does not erase credentials from older artifacts.
+
+## Activate verified publishing (PLT-260 scope extension)
+
+- When: after the app PR's review/CI, before publishing the prerequisite image.
+- Tiers: GitHub and GHCR; no automatic RV rollout.
+- Do: require the green `pr / verify` context on main; retain the human merge gate.
+  The organization bot App key already has ALL repository visibility; the workflow
+  requests a token scoped only to rvc2mqtt. After merge, wait for successful main image
+  CI, preview `Cut release` with `dry_run=true`, then cut the approved stable release.
+  Use its exact digest for the companion homelab pin and mount change together.
+- Verify: both architecture scans pass, the authenticated amd64 container test passes,
+  commit and stable tags resolve to the same attested index, and release notes contain
+  the external-INI breaking step and that digest. Confirm no autonomous pin consumer
+  before release. Keep the previous digest available for the paired deployment rollback.
+- Why: the old workflow published without test/scan gates and rebuilt release tags.
+  `latest` now means stable release; main builds use `edge`, and the `main` tag is retired.

@@ -563,11 +563,14 @@ services:
 ## Advanced Configuration
 
 ### Custom Dockerfile Modifications
-Example: Add additional Python packages
-```dockerfile
-# Add after pip install line in Dockerfile
-RUN pip install --no-cache-dir numpy pandas
+Add runtime packages to the locked dependency group, then rebuild:
+```bash
+uv add --group runtime numpy pandas
+uv export --locked --only-group runtime --format requirements-txt --output-file requirements.txt
+docker build -t rvc2mqtt:local .
 ```
+The Dockerfile installs `uv.lock`; `requirements.txt` is a generated compatibility export.
+See [releasing](RELEASING.md) for the publishing gates and stable image tags.
 
 ### Multi-Architecture Support
 Build for different platforms:

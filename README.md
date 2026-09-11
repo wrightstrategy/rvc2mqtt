@@ -45,7 +45,7 @@ The bridge can decode and publish data for:
 
 ## Requirements
 
-- Python 3.8 or higher
+- Python 3.11 (the tested container and local development version)
 - Network-accessible CAN bus interface (SLCAN over TCP/IP)
 - MQTT broker (e.g., Mosquitto)
 - RV-C specification file (included as `rvc-spec.yml`)
@@ -60,7 +60,7 @@ The bridge can decode and publish data for:
 
 2. **Install Python dependencies**:
    ```bash
-   pip install -r requirements.txt
+   uv sync --locked --only-group runtime
    ```
 
 3. **Configure the application**:
@@ -145,7 +145,7 @@ backup_count = 5                        ; Number of backup files to keep
 
 Run the bridge:
 ```bash
-python3 rvc2mqtt.py
+uv run --locked --only-group runtime python rvc2mqtt.py
 ```
 
 The script will:
@@ -410,3 +410,9 @@ Contributions are welcome! Please feel free to submit issues or pull requests.
 ## Support
 
 For issues, questions, or feature requests, please open an issue on GitHub.
+
+## Building and releasing
+
+See [the release runbook](docs/RELEASING.md) for CI gates, immutable image tags,
+release previews, and required deployment notes. `latest` now tracks stable releases;
+`edge` tracks verified main builds. Existing digest pins do not move automatically.
