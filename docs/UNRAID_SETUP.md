@@ -111,12 +111,12 @@ Edit `/mnt/user/appdata/rvc2mqtt/rvc2mqtt.ini`:
 
 ```ini
 [MQTT]
-mqttBroker = 192.168.1.100    # Your MQTT broker IP
-mqttUser = hassio              # Your MQTT username
-mqttPass = your-password       # Your MQTT password
+mqttBroker = 192.168.1.100    ; Your MQTT broker IP
+mqttUser = hassio              ; Your MQTT username
+mqttPass = your-password       ; Your MQTT password
 
 [CAN]
-CANport = 192.168.1.200:3333   # Your ESP32 SLCAN IP:port
+CANport = 192.168.1.200:3333   ; Your ESP32 SLCAN IP:port
 ```
 
 ### Optional Settings
