@@ -33,7 +33,9 @@ def main(image):
             docker("run", "--rm", "--user", "0", "--mount",
                    f"type=bind,src={root},dst=/mosquitto/config", BROKER,
                    "mosquitto_passwd", "-b", "-c", "/mosquitto/config/passwords", "test-user", "test-password")
-            (root / "passwords").chmod(0o644)
+            docker("run", "--rm", "--user", "0", "--mount",
+                   f"type=bind,src={root},dst=/mosquitto/config", BROKER,
+                   "chmod", "0644", "/mosquitto/config/passwords")
             broker = docker("run", "-d", "--network", network, "--network-alias", "broker",
                             "--mount", f"type=bind,src={root},dst=/mosquitto/config,readonly", BROKER).stdout.strip()
             containers.append(broker)
