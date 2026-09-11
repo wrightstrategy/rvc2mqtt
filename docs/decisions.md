@@ -17,3 +17,16 @@ Keep the foreground Python process and existing restart policy. Report container
 state honestly, and verify fresh RV state separately from broker connectivity. See
 [container monitoring](DOCKER_DEPLOYMENT.md#container-statistics) for the operational
 contract. A functional bridge healthcheck is outside this change's scope.
+
+## 2026-09-11: Deployment-owned INI and configurable MQTT port (PLT-260)
+
+Require the deployment to supply the complete INI and read the MQTT port from it
+(defaulting to 1883 for existing external files). The old image bundled one site's
+connection settings, and its hard-coded port made declarative deployment settings
+ineffective. Keeping one INI interface avoids competing environment precedence.
+The loader reports configuration failures without echoing credential-bearing input.
+
+See [configuration](../README.md#configuration) and the pending deployment steps.
+Non-broker behavior and the existing INI dialect are preserved. Historical images
+and repository history are not rewritten; historical credential exposure is a
+separate operator decision.

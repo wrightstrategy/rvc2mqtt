@@ -2,7 +2,7 @@
 # Phase 2.5: Production Deployment
 # Base: Python 3.11 slim for smaller image size
 
-FROM python:3.11-slim
+FROM python:3.11-slim@sha256:9534e5a8e315485d4061ed659af0fd78a284c015f9b73661b41d6bab25604534
 
 # Set metadata
 LABEL maintainer="rvc2mqtt"
@@ -33,7 +33,7 @@ RUN --mount=from=ghcr.io/astral-sh/uv:0.12.11@sha256:79c6f4776b851471cc73b7d21d0
     uv pip uninstall --system setuptools && uv pip check --system
 
 # Copy application files
-COPY rvc2mqtt.py .
+COPY rvc2mqtt.py rvc_config.py .
 COPY ha_discovery.py .
 COPY rvc_commands.py .
 COPY can_tx.py .
@@ -43,8 +43,7 @@ COPY audit_logger.py .
 COPY mqttlog.py .
 COPY rvc-spec.yml .
 
-# Copy default configuration (will be overridden by volume mount)
-COPY rvc2mqtt.ini .
+# Deployment must mount its own /app/rvc2mqtt.ini; site settings never enter the image.
 
 # Copy mappings directory
 COPY mappings/ ./mappings/

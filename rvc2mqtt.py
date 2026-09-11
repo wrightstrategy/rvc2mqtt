@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
-import argparse, array, can, json, os, queue, re, signal, threading, time, sys, serial, time, configparser
+import argparse, array, can, json, os, queue, re, signal, threading, time, sys, serial, time
 import paho.mqtt.client as mqtt
 from paho.mqtt.client import CallbackAPIVersion
 import ruamel.yaml as yaml
 from datetime import datetime
 from ha_discovery import HADiscovery
+from rvc_config import ConfigurationError, load_configuration
 
 # Phase 2: Bidirectional Control
 from rvc_commands import RVCCommandEncoder
@@ -14,13 +15,17 @@ from can_tx import CANTransmitter
 from audit_logger import AuditLogger
 from command_handler import CommandHandler
 
-config = configparser.ConfigParser(inline_comment_prefixes=';')
-config.read('rvc2mqtt.ini')
+try:
+    config = load_configuration()
+except ConfigurationError as error:
+    print(f"Configuration error: {error}", file=sys.stderr)
+    sys.exit(1)
 debug_level = config.getint('General', 'debug')
 parameterized_strings = bool(config.getint('General', 'parameterized_strings'))
 screenOut = config.getint('General', 'screenout')
 specfile = config.get('General', 'specfile')
 mqttBroker = config.get('MQTT', 'mqttBroker')
+mqttPort = config.getint('MQTT', 'mqttPort', fallback=1883)
 mqttUser = config.get('MQTT', 'mqttUser')
 mqttPass = config.get('MQTT', 'mqttPass')
 mqttOut = config.getint('MQTT', 'mqttOut')
@@ -836,8 +841,8 @@ if __name__ == "__main__":
         print("CAN receive thread started\n")
 
         try:
-            print("Connecting to MQTT: {0:s}".format(mqttBroker))
-            mqttc.connect(mqttBroker, port=1883) #connect to broker
+            print(f"Connecting to MQTT: {mqttBroker}:{mqttPort}")
+            mqttc.connect(mqttBroker, port=mqttPort) #connect to broker
 
             # Publish HA Discovery messages and availability status
             if ha_discovery:

@@ -8,6 +8,7 @@ screenout = 0                   ; Output level, 0=none, 1=Dump parsed messages t
 specfile = rvc-spec.yml         ; RV-C specification file path
 
 [MQTT]
+mqttPort = 1883              ; Broker TCP port (1-65535); defaults to 1883 if omitted
 mqttBroker = 192.168.1.100    ; MQTT broker IP address or hostname
 mqttOut = 2                   ; Send to MQTT: 0=off, 1=Publish (no retain), 2=Publish with retain
 mqttUser = username           ; MQTT username

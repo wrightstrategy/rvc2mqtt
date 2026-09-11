@@ -23,12 +23,19 @@ cd rvc2mqtt
 ```
 
 ### 2. Configure
-Edit `rvc2mqtt.ini` to match your environment:
+Copy `rvc2mqtt.ini.example` to `rvc2mqtt.ini`, then edit it to match your environment.
+The file is required; the image contains no default site configuration. Keep it outside
+git and mount it read-only at `/app/rvc2mqtt.ini`, readable by UID 99.
+`mqttPort` defaults to 1883 when omitted and must be between 1 and 65535.
+The parser uses semicolon inline comments and `%%` for a literal percent sign.
+
+For example:
 ```ini
 [MQTT]
+mqttPort = 1883                ; Broker TCP port
 mqttBroker = 192.168.50.77    ; Your MQTT broker IP
-mqttUser = hassio              ; Your MQTT username
-mqttPass = hassio              ; Your MQTT password
+mqttUser = example-user              ; Your MQTT username
+mqttPass = example-password              ; Your MQTT password
 
 [CAN]
 CANport = 192.168.50.103:3333  ; Your ESP32 SLCAN TCP address
@@ -111,15 +118,12 @@ docker run -d \
 ## Configuration
 
 ### Environment Variables
-Configure via `docker-compose.yml`:
+Only timezone is configured through the environment. Broker host, port, username,
+and password come exclusively from the INI; `MQTT_*` overrides are unsupported.
+Configure timezone via `docker-compose.yml`:
 ```yaml
 environment:
   - TZ=America/New_York          # Your timezone
-  # Optional overrides:
-  # - DEBUG_LEVEL=1
-  # - MQTT_BROKER=192.168.50.77
-  # - MQTT_USER=hassio
-  # - MQTT_PASS=hassio
 ```
 
 ### Volume Mounts
@@ -290,7 +294,8 @@ docker-compose logs | grep -i error
 - **Permission denied**: Check volume mount permissions
   ```bash
   chmod 755 logs audit
-  chmod 644 rvc2mqtt.ini
+  sudo chown 99 rvc2mqtt.ini
+  sudo chmod 400 rvc2mqtt.ini
   ```
 - **Port already in use**: Another process using network
   ```bash
@@ -420,34 +425,19 @@ grep "latency" audit/command_audit.log
 ```bash
 # Recommended permissions
 chmod 755 logs audit mappings
-chmod 644 rvc2mqtt.ini rvc-spec.yml
+sudo chown 99 rvc2mqtt.ini
+sudo chmod 400 rvc2mqtt.ini
+chmod 644 rvc-spec.yml
 chmod 644 mappings/*.yaml
 ```
 
 ### MQTT Credentials
-Best practices for securing MQTT credentials:
 
-1. **Use Environment Variables** (Recommended)
-   ```yaml
-   environment:
-     - MQTT_USER=${MQTT_USER}
-     - MQTT_PASS=${MQTT_PASS}
-   ```
-
-   Create `.env` file (add to .gitignore):
-   ```
-   MQTT_USER=hassio
-   MQTT_PASS=your_secure_password
-   ```
-
-2. **Use Docker Secrets** (Most Secure)
-   ```yaml
-   secrets:
-     mqtt_user:
-       file: ./secrets/mqtt_user.txt
-     mqtt_pass:
-       file: ./secrets/mqtt_pass.txt
-   ```
+Provision credentials into the required mounted INI through your deployment secret
+manager. Neither MQTT environment variables nor Docker secret files are read directly
+by the application. A deployment may render the INI from secret files before startup.
+Keep the INI readable by UID 99 and inaccessible to unrelated host users. Recreate the
+container after an atomic file replacement so Docker opens the new file inode.
 
 ### Network Security
 - Use host network mode only on trusted networks

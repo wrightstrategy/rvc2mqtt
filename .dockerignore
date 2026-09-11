@@ -66,3 +66,6 @@ examples/
 # Any local configuration that shouldn't be in image
 *.local
 .env
+
+# Deployment-owned configuration may contain credentials.
+rvc2mqtt.ini
