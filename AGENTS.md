@@ -89,3 +89,18 @@ This repo is: RV-C CAN bus to MQTT bridge with Home Assistant discovery and bidi
 It **consumes**: nothing yet. It's **consumed by**: nothing yet.
 Full map: `wrightstrategy/bridge` → `ARCHITECTURE.md`.
 <!-- ws:system-context end -->
+
+## Local departures
+
+- **Default:** [Container workflow choice](https://github.com/wrightstrategy/bridge/blob/main/conventions/dev-reference.md#container-images--ci).
+  **Scope:** this public repository's image and release workflows.
+  **Replacement:** repository-local workflows on GitHub-hosted runners preserve the binding
+  test, scan, provenance/SBOM, image-identity, and release-tag contracts.
+  **Reason:** a public caller cannot access Bridge's private reusable workflows; public
+  repositories are excluded from the private runner pool. No private workflow is published.
+- **Default:** [Release lanes](https://github.com/wrightstrategy/bridge/blob/main/conventions/dev-reference.md#python-python-semantic-release-tag-only-from-a-dispatched-workflow).
+  **Scope:** this app's initial formal release automation.
+  **Replacement:** stable releases from main only, using the pinned tag-only tool and App
+  token; version identity comes from git tags, without package-version stamping.
+  **Reason:** the app is un-packaged scripts with one deployment line; additional release
+  trains and a packaging/version API would add unused interfaces. See docs/RELEASING.md.

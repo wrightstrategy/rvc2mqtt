@@ -52,11 +52,12 @@ mqtt_messages.log
 *.sqlite
 *.db
 
-# Configuration (uncomment if you want to ignore local config changes)
-# rvc2mqtt.ini
 
 # Temporary and Cache Files
 *.tmp
 *.temp
 .cache/
 *.pid
+
+# Deployment-owned configuration may contain credentials.
+rvc2mqtt.ini

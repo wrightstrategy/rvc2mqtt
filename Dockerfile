@@ -2,38 +2,33 @@
 # Phase 2.5: Production Deployment
 # Base: Python 3.11 slim for smaller image size
 
-FROM python:3.11-slim
+FROM python:3.11-slim@sha256:9534e5a8e315485d4061ed659af0fd78a284c015f9b73661b41d6bab25604534 AS base
+
+FROM base AS dependencies
+WORKDIR /app
+COPY pyproject.toml uv.lock .python-version ./
+RUN --mount=from=ghcr.io/astral-sh/uv:0.12.11@sha256:79c6f4776b851471cc73b7d21d0cc834bb94383c292e83640d27eff512864df7,source=/uv,target=/bin/uv \
+    uv sync --locked --only-group runtime --no-managed-python --no-cache
+
+FROM base AS runtime
+# Preserve the existing removal of vulnerable, unused system build tooling.
+RUN --mount=from=ghcr.io/astral-sh/uv:0.12.11@sha256:79c6f4776b851471cc73b7d21d0cc834bb94383c292e83640d27eff512864df7,source=/uv,target=/bin/uv \
+    uv pip uninstall --python /usr/local/bin/python setuptools
+ENV PATH="/app/.venv/bin:$PATH"
+COPY --from=dependencies /app/.venv /app/.venv
 
 # Set metadata
 LABEL maintainer="rvc2mqtt"
 LABEL description="RV-C to MQTT bridge with Home Assistant Discovery"
-LABEL version="2.5.0"
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     DEBIAN_FRONTEND=noninteractive
 
-# Install system dependencies (if needed for python-can or serial)
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
-
-# Create application directory
 WORKDIR /app
 
-# Copy requirements first for better layer caching
-COPY requirements.txt .
-
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# setuptools is build tooling, not a runtime dependency. Remove its vendored
-# packages after installation; uv is mounted only for this build step.
-RUN --mount=from=ghcr.io/astral-sh/uv:0.12.11@sha256:79c6f4776b851471cc73b7d21d0cc834bb94383c292e83640d27eff512864df7,source=/uv,target=/bin/uv \
-    uv pip uninstall --system setuptools && uv pip check --system
-
 # Copy application files
-COPY rvc2mqtt.py .
+COPY rvc2mqtt.py rvc_config.py .
 COPY ha_discovery.py .
 COPY rvc_commands.py .
 COPY can_tx.py .
@@ -43,8 +38,7 @@ COPY audit_logger.py .
 COPY mqttlog.py .
 COPY rvc-spec.yml .
 
-# Copy default configuration (will be overridden by volume mount)
-COPY rvc2mqtt.ini .
+# Deployment must mount its own /app/rvc2mqtt.ini; site settings never enter the image.
 
 # Copy mappings directory
 COPY mappings/ ./mappings/

@@ -1,0 +1,32 @@
+[dependency-groups]
+runtime = [
+  "python-can>=4.2.0",
+  "paho-mqtt>=2.0.0",
+  "PyYAML>=6.0.0",
+  "ruamel.yaml>=0.17.0",
+  "pyserial>=3.5",
+]
+
+[tool.uv]
+package = false
+
+[tool.semantic_release]
+tag_format = "v{version}"
+allow_zero_version = false
+version_toml = []
+version_variables = []
+commit_parser = "conventional"
+
+[tool.semantic_release.branches.main]
+match = "main"
+prerelease = false
+
+[tool.semantic_release.commit_parser_options]
+minor_tags = ["feat"]
+patch_tags = ["fix"]
+
+[tool.semantic_release.changelog]
+exclude_commit_patterns = ["^(build|chore|ci|docs|perf|refactor|style|test)(\\([^)]*\\))?!?:"]
+
+[tool.semantic_release.remote]
+type = "github"

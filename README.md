@@ -45,7 +45,7 @@ The bridge can decode and publish data for:
 
 ## Requirements
 
-- Python 3.8 or higher
+- Python 3.11 (the tested container and local development version)
 - Network-accessible CAN bus interface (SLCAN over TCP/IP)
 - MQTT broker (e.g., Mosquitto)
 - RV-C specification file (included as `rvc-spec.yml`)
@@ -60,64 +60,75 @@ The bridge can decode and publish data for:
 
 2. **Install Python dependencies**:
    ```bash
-   pip install -r requirements.txt
+   uv sync --locked --only-group runtime
    ```
 
 3. **Configure the application**:
-   Edit `rvc2mqtt.ini` with your settings (see Configuration section below)
+   Copy `rvc2mqtt.ini.example` to `rvc2mqtt.ini`, then edit it with your settings.
+   The local file is ignored by git and must never be committed.
 
 ## Configuration
+
+The application requires `rvc2mqtt.ini` in its working directory. Docker deployments
+must mount it read-only at `/app/rvc2mqtt.ini`, readable by container UID 99. Images
+contain no site configuration. MQTT environment variables are not supported.
+
+`mqttPort` defaults to 1883 if omitted and accepts 1–65535. Configuration errors fail
+before network activity without printing credentials. The INI parser uses semicolon
+inline comments and percent interpolation: write a literal `%` as `%%`; do not put
+a whitespace-prefixed semicolon inside a value.
 
 Edit `rvc2mqtt.ini` to configure the bridge:
 
 ```ini
 [General]
-debug = 0                       # Debug level: 0=none, 1=errors, 2=errors+warnings, 3=all
-parameterized_strings = 0       # Send parameterized strings to MQTT (0 or 1)
-screenout = 0                   # Console output: 0=none, 1=dump parsed messages
-specfile = rvc-spec.yml         # RV-C specification file path
+debug = 0                       ; Debug level: 0=none, 1=errors, 2=errors+warnings, 3=all
+parameterized_strings = 0       ; Send parameterized strings to MQTT (0 or 1)
+screenout = 0                   ; Console output: 0=none, 1=dump parsed messages
+specfile = rvc-spec.yml         ; RV-C specification file path
 
 [MQTT]
-mqttBroker = 192.168.1.100      # MQTT broker IP address
-mqttOut = 2                     # Send to MQTT: 0=off, 1=publish, 2=retain
-mqttUser = username             # MQTT username
-mqttPass = password             # MQTT password
-mqttOutputTopic = RVC2          # Base MQTT topic for publishing
+mqttPort = 1883                ; MQTT broker TCP port
+mqttBroker = 192.168.1.100      ; MQTT broker IP address
+mqttOut = 2                     ; Send to MQTT: 0=off, 1=publish, 2=retain
+mqttUser = username             ; MQTT username
+mqttPass = password             ; MQTT password
+mqttOutputTopic = RVC2          ; Base MQTT topic for publishing
 
 [CAN]
-CANport = 192.168.1.200:3333    # CAN bus interface IP:port
+CANport = 192.168.1.200:3333    ; CAN bus interface IP:port
 
 [HomeAssistant]
-discovery_enabled = 1                        # Enable HA MQTT Discovery (0=disabled, 1=enabled)
-discovery_prefix = homeassistant             # HA discovery prefix (usually 'homeassistant')
-mapping_file = mappings/tiffin_default.yaml  # Entity mapping configuration file
-legacy_topics = 1                            # Keep publishing old RVC2/* topics (0=no, 1=yes)
+discovery_enabled = 1                        ; Enable HA MQTT Discovery (0=disabled, 1=enabled)
+discovery_prefix = homeassistant             ; HA discovery prefix (usually 'homeassistant')
+mapping_file = mappings/tiffin_default.yaml  ; Entity mapping configuration file
+legacy_topics = 1                            ; Keep publishing old RVC2/* topics (0=no, 1=yes)
 
 [Commands]
-enabled = 1                     # Enable bidirectional commands (0=disabled, 1=enabled)
-source_address = 99             # CAN source address for commands (default: 99)
-retry_count = 3                 # Number of retries for failed CAN transmissions
-retry_delay_ms = 100            # Delay between retries in milliseconds
+enabled = 1                     ; Enable bidirectional commands (0=disabled, 1=enabled)
+source_address = 99             ; CAN source address for commands (default: 99)
+retry_count = 3                 ; Number of retries for failed CAN transmissions
+retry_delay_ms = 100            ; Delay between retries in milliseconds
 
 [RateLimiting]
-enabled = 1                             # Enable rate limiting (0=disabled, 1=enabled)
-global_commands_per_second = 10         # Max commands per second (global)
-entity_commands_per_second = 2          # Max commands per second per entity
-entity_cooldown_ms = 500                # Minimum delay between commands to same entity (ms)
+enabled = 1                             ; Enable rate limiting (0=disabled, 1=enabled)
+global_commands_per_second = 10         ; Max commands per second (global)
+entity_commands_per_second = 2          ; Max commands per second per entity
+entity_cooldown_ms = 500                ; Minimum delay between commands to same entity (ms)
 
 [Security]
-enabled = 1                             # Enable security controls (0=disabled, 1=enabled)
-allowlist =                             # Comma-separated list of allowed entity_ids (empty = all allowed)
-denylist =                              # Comma-separated list of denied entity_ids (empty = none denied)
-allowed_commands = light,climate,switch # Allowed command types (comma-separated)
+enabled = 1                             ; Enable security controls (0=disabled, 1=enabled)
+allowlist =                             ; Comma-separated list of allowed entity_ids (empty = all allowed)
+denylist =                              ; Comma-separated list of denied entity_ids (empty = none denied)
+allowed_commands = light,climate,switch ; Allowed command types (comma-separated)
 
 [Audit]
-enabled = 1                             # Enable audit logging (0=disabled, 1=enabled)
-log_file = logs/command_audit.log       # Audit log file path
-log_level = INFO                        # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
-json_format = 1                         # Use JSON format (1) or human-readable (0)
-max_bytes = 10485760                    # Max log file size before rotation (10 MB)
-backup_count = 5                        # Number of backup files to keep
+enabled = 1                             ; Enable audit logging (0=disabled, 1=enabled)
+log_file = logs/command_audit.log       ; Audit log file path
+log_level = INFO                        ; Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+json_format = 1                         ; Use JSON format (1) or human-readable (0)
+max_bytes = 10485760                    ; Max log file size before rotation (10 MB)
+backup_count = 5                        ; Number of backup files to keep
 ```
 
 ### Configuration Options
@@ -134,7 +145,7 @@ backup_count = 5                        # Number of backup files to keep
 
 Run the bridge:
 ```bash
-python3 rvc2mqtt.py
+uv run --locked --only-group runtime python rvc2mqtt.py
 ```
 
 The script will:
@@ -216,7 +227,7 @@ See [Command Format Guide](docs/COMMAND_FORMAT.md) for complete documentation.
 ```
 rvc2mqtt/
 ├── rvc2mqtt.py                      # Main application script
-├── rvc2mqtt.ini                     # Configuration file
+├── rvc2mqtt.ini.example             # Copy to your deployment-owned configuration
 ├── ha_discovery.py                  # Home Assistant MQTT Discovery module
 ├── rvc-spec.yml                     # RV-C protocol specification
 ├── mqttlog.py                       # MQTT logging utility
@@ -399,3 +410,9 @@ Contributions are welcome! Please feel free to submit issues or pull requests.
 ## Support
 
 For issues, questions, or feature requests, please open an issue on GitHub.
+
+## Building and releasing
+
+See [the release runbook](docs/RELEASING.md) for CI gates, immutable image tags,
+release previews, and required deployment notes. `latest` now tracks stable releases;
+`edge` tracks verified main builds. Existing digest pins do not move automatically.

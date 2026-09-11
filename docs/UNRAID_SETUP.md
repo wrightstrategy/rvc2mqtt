@@ -29,7 +29,7 @@ Quick guide for installing rvc2mqtt on Unraid using the Docker template.
    git clone https://github.com/wrightstrategy/rvc2mqtt.git
 
    # Copy config files to appdata
-   cp /tmp/rvc2mqtt/rvc2mqtt.ini /mnt/user/appdata/rvc2mqtt/
+   cp /tmp/rvc2mqtt/rvc2mqtt.ini.example /mnt/user/appdata/rvc2mqtt/rvc2mqtt.ini
    cp /tmp/rvc2mqtt/rvc-spec.yml /mnt/user/appdata/rvc2mqtt/
    cp -r /tmp/rvc2mqtt/mappings/* /mnt/user/appdata/rvc2mqtt/mappings/
 
@@ -59,7 +59,7 @@ Quick guide for installing rvc2mqtt on Unraid using the Docker template.
    - **Logs Directory**: `/mnt/user/appdata/rvc2mqtt/logs`
    - **Audit Directory**: `/mnt/user/appdata/rvc2mqtt/audit`
    - **Timezone**: Your timezone (e.g., `America/New_York`)
-   - Leave other fields at defaults unless you want to override config file settings
+   - MQTT settings are configured only in the mounted INI.
 
 6. **Apply and Start**
    - Click "Apply"
@@ -86,7 +86,7 @@ cd /mnt/user/appdata/rvc2mqtt
 
 # Get config files
 git clone https://github.com/wrightstrategy/rvc2mqtt.git temp
-cp temp/rvc2mqtt.ini .
+cp temp/rvc2mqtt.ini.example rvc2mqtt.ini
 cp temp/rvc-spec.yml .
 cp -r temp/mappings/* mappings/
 cp temp/docker-compose.yml .
@@ -111,22 +111,19 @@ Edit `/mnt/user/appdata/rvc2mqtt/rvc2mqtt.ini`:
 
 ```ini
 [MQTT]
-mqttBroker = 192.168.1.100    # Your MQTT broker IP
-mqttUser = hassio              # Your MQTT username
-mqttPass = your-password       # Your MQTT password
+mqttBroker = 192.168.1.100    ; Your MQTT broker IP
+mqttUser = hassio              ; Your MQTT username
+mqttPass = your-password       ; Your MQTT password
 
 [CAN]
-CANport = 192.168.1.200:3333   # Your ESP32 SLCAN IP:port
+CANport = 192.168.1.200:3333   ; Your ESP32 SLCAN IP:port
 ```
 
 ### Optional Settings
 
-You can override config file settings via Unraid template environment variables:
-- **MQTT_BROKER**: Override MQTT broker IP
-- **MQTT_USER**: Override MQTT username
-- **MQTT_PASS**: Override MQTT password
-- **CAN_PORT**: Override CAN interface address
-- **DEBUG_LEVEL**: Set debug level (0-3)
+Configure broker host/port, credentials, CAN interface, and debug level in the mounted
+INI. The template's timezone is the only supported environment setting. MQTT, CAN, and
+debug environment overrides are not implemented.
 
 ## Updating
 
