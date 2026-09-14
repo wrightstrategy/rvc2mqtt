@@ -40,6 +40,16 @@ CI additionally scans the built image with Trivy 0.74.0, failing on fixable HIGH
 vulnerabilities. The adoption full-history gitleaks scan found zero scanner findings;
 this does not establish that historical site credentials have been revoked or erased.
 
+The image pins its base by digest and then applies Debian security updates in the same
+build (`apt-get upgrade` in the `base` stage). The digest fixes what upstream shipped;
+the upgrade covers what Debian has fixed since that upstream rebuild. Without it, a
+security advisory published between upstream rebuilds fails the scan gate and blocks
+every pull request, with no newer digest available to move to. Every uncached build
+therefore carries the security suite as of its own build time, so two builds of the same
+commit can differ in OS package versions; a build that reuses the cached upgrade layer
+carries whatever that layer captured. CI builds on fresh runners without an imported
+build cache, so the promoted digest is always freshly upgraded and the one CI scanned.
+
 The unrelated legacy `run_tests.py` suite had 38 failures and 2 errors in 90 tests on
 untouched main; its separate core suite had 3 failures. They remain outside this pipeline's
 configuration/release acceptance coverage. No CAN encoding or validator behavior was

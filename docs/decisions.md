@@ -45,3 +45,17 @@ stable tags with the existing organization App token, without a release commit. 
 steps and image identity are carried in release notes. `latest` now tracks stable releases;
 `edge` carries verified main builds. See [releasing](RELEASING.md) for the current contract,
 verification coverage, inherited legacy-test limitations, and operator actions.
+
+## 2026-09-13: Patch the base image in the build, not only by digest (SWW-201)
+
+Twelve fixable HIGH/CRITICAL Debian advisories (perl-base, libpcre2-8-0, libsqlite3-0,
+gzip) landed after Docker last rebuilt `python:3.11-slim`. The pinned digest was already
+the current upstream tag, so there was no refreshed base to bump to and the required
+`pr / verify` check blocked every pull request. Apply Debian security updates in the
+`base` stage instead of waiting on upstream's rebuild cadence, keeping the digest pin for
+build provenance. Scan policy is unchanged: the gate still fails on fixable HIGH/CRITICAL,
+which is what makes these advisories actionable rather than allowlistable.
+
+This trades exact build reproducibility for timely patching. Build-once-then-promote
+already means one scanned digest per commit, so the promoted artifact is still exactly
+what CI tested. See [releasing](RELEASING.md).
