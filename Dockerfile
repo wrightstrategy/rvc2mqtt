@@ -4,6 +4,16 @@
 
 FROM python:3.11-slim@sha256:9534e5a8e315485d4061ed659af0fd78a284c015f9b73661b41d6bab25604534 AS base
 
+# Apply Debian security updates at build time. The digest above pins the exact
+# upstream base, but that base is rebuilt on Docker's cadence, not Debian's: a
+# fixed CVE published after the last upstream rebuild would otherwise fail the
+# CI scan gate and block every PR until upstream catches up. Upgrading here
+# patches whatever the security suite has fixed at the moment we build.
+RUN apt-get update \
+    && apt-get upgrade -y --no-install-recommends \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 FROM base AS dependencies
 WORKDIR /app
 COPY pyproject.toml uv.lock .python-version ./
