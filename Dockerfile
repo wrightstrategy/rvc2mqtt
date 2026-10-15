@@ -21,9 +21,9 @@ RUN --mount=from=ghcr.io/astral-sh/uv:0.12.11@sha256:79c6f4776b851471cc73b7d21d0
     uv sync --frozen --only-group runtime --no-managed-python --python /usr/local/bin/python --no-cache
 
 FROM base AS runtime
-# Preserve the existing removal of vulnerable, unused system build tooling.
+# Remove unused packaging tools and their vendored dependencies from the runtime.
 RUN --mount=from=ghcr.io/astral-sh/uv:0.12.11@sha256:79c6f4776b851471cc73b7d21d0cc834bb94383c292e83640d27eff512864df7,source=/uv,target=/bin/uv \
-    uv pip uninstall --python /usr/local/bin/python setuptools
+    uv pip uninstall --python /usr/local/bin/python pip setuptools
 ENV PATH="/app/.venv/bin:$PATH"
 COPY --from=dependencies /app/.venv /app/.venv
 
