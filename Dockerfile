@@ -1,6 +1,6 @@
 # RVC2MQTT Docker Container
 # Phase 2.5: Production Deployment
-# Base: Python 3.11 slim for smaller image size
+# Base: Python slim for smaller image size
 
 FROM python:3.11-slim@sha256:9534e5a8e315485d4061ed659af0fd78a284c015f9b73661b41d6bab25604534 AS base
 
@@ -16,9 +16,9 @@ RUN apt-get update \
 
 FROM base AS dependencies
 WORKDIR /app
-COPY pyproject.toml uv.lock .python-version ./
+COPY pyproject.toml uv.lock ./
 RUN --mount=from=ghcr.io/astral-sh/uv:0.12.11@sha256:79c6f4776b851471cc73b7d21d0cc834bb94383c292e83640d27eff512864df7,source=/uv,target=/bin/uv \
-    uv sync --locked --only-group runtime --no-managed-python --no-cache
+    uv sync --frozen --only-group runtime --no-managed-python --python /usr/local/bin/python --no-cache
 
 FROM base AS runtime
 # Preserve the existing removal of vulnerable, unused system build tooling.

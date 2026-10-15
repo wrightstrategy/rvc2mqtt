@@ -1,5 +1,16 @@
 # Decisions
 
+## 2026-10-14: Use the base image's Python in Docker builds (SWW-238)
+
+The Docker build copied `.python-version` and ran `uv sync --no-managed-python`,
+so Renovate's `python:3.11-slim` to `3.14-slim` update failed before application
+tests: the image had 3.14 but uv demanded 3.11. The build now selects the base
+image's `/usr/local/bin/python` explicitly and installs from `uv.lock` with
+`--frozen`. The repository's `ci/check.sh` still checks lockfile freshness with
+`--locked`; the image build tests installation on its actual Python version.
+Automated base image updates can proceed through the image test and scan gate. See
+[releasing](RELEASING.md).
+
 ## 2026-09-08: Remove the process-only healthcheck and unused setuptools (PLT-352)
 
 The image and example Compose configuration no longer run `pgrep` as a healthcheck.

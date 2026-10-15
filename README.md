@@ -45,7 +45,7 @@ The bridge can decode and publish data for:
 
 ## Requirements
 
-- Python 3.11 (the tested container and local development version)
+- Python 3.11 for local development; the container uses the Python version in its tested base image
 - Network-accessible CAN bus interface (SLCAN over TCP/IP)
 - MQTT broker (e.g., Mosquitto)
 - RV-C specification file (included as `rvc-spec.yml`)
