@@ -1,5 +1,15 @@
 # Decisions
 
+## 2026-10-14: Remove unused pip from the runtime image (SWW-238)
+
+After the Python 3.14 base update, the image built and passed its MQTT test, but
+Trivy found four fixable HIGH vulnerabilities in Python packages bundled with
+the base image's `pip`. The bridge installs locked dependencies into an isolated
+virtual environment during the build and does not need system `pip` at runtime.
+Remove it with the already mounted uv alongside unused `setuptools`; preserve
+the fixable HIGH/CRITICAL scan gate. A Python 3.14 image without system `pip`
+passed the image scan and MQTT container test. See [releasing](RELEASING.md).
+
 ## 2026-10-14: Use the base image's Python in Docker builds (SWW-238)
 
 The Docker build copied `.python-version` and ran `uv sync --no-managed-python`,

@@ -17,8 +17,9 @@ uv export --locked --only-group runtime --format requirements-txt --output-file 
 ```
 
 The runtime dependency versions were preserved when introducing the lock. Docker uses
-an isolated virtual environment, retains UID 99:100, and removes the unused system
-setuptools as before. Version identity comes from git release tags and the image digest;
+an isolated virtual environment, retains UID 99:100, and removes unused system
+`pip` and `setuptools` from the runtime image. Version identity comes from git
+release tags and the image digest;
 the old hard-coded `2.5.0` Docker label was removed. There were no existing `v*` git tags
 at adoption; the first formal stable release is derived from history, starting at 1.0.0.
 
