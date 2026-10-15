@@ -7,7 +7,10 @@ scan, and promotion contract. It consumes no private source or fork-accessible c
 
 `pyproject.toml`'s `runtime` dependency group and `uv.lock` own runtime dependencies.
 This is a collection of scripts, not an installed Python package. `.python-version`
-selects the tested Python 3.11 runtime. `requirements.txt` is generated with:
+selects the local development Python 3.11 runtime. The Docker build installs
+the committed lockfile into the Python interpreter supplied by its base image;
+`ci/check.sh` checks the lockfile against project dependencies.
+`requirements.txt` is generated with:
 
 ```sh
 uv export --locked --only-group runtime --format requirements-txt --output-file requirements.txt
