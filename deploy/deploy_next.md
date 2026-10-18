@@ -1,5 +1,17 @@
 # Pending deployment steps
 
+## Pin the first stable release on rv-server (PLT-468)
+
+- When: at the operator-timed rv-server rollout; publishing v1.0.0 does not deploy it.
+- Tiers: homelab rv-server.
+- Do: in the homelab deployment change, pin
+  `ghcr.io/wrightstrategy/rvc2mqtt:1.0.0@sha256:90b85b4fdf790329a4f0cd0eb83dd89b0b9e6e799d36d14e9847e216c4f009bb`.
+  Keep the image pin and required external MQTT configuration together.
+- Verify: the deployed image resolves to that index digest, then confirm authenticated
+  MQTT connectivity and fresh RV telemetry.
+- Why: rv-server currently pins a commit image; the stable version and index digest
+  identify the released, tested image for its production rollout.
+
 ## Remove the obsolete container healthcheck (PLT-352, PR #26)
 
 - When: with the new image.
