@@ -17,9 +17,9 @@ if [ ! -x "${ws_gitleaks_bin}" ]; then
   # (the staging directory sits beside the cache entry, so the rename is atomic).
   ws_gitleaks_tarball="gitleaks_${ws_gitleaks_version}_${ws_gitleaks_asset}.tar.gz"
   echo "pre-commit: fetching pinned gitleaks ${ws_gitleaks_version} (first use on this machine)" >&2
-  mkdir -p "${ws_gitleaks_dir}" && ws_gitleaks_tmp="$(mktemp -d "${ws_gitleaks_dir}/.fetch.XXXXXX")" || {
+  if ! mkdir -p "${ws_gitleaks_dir}" || ! ws_gitleaks_tmp="$(mktemp -d "${ws_gitleaks_dir}/.fetch.XXXXXX")"; then
     echo "pre-commit: cannot create ${ws_gitleaks_dir}; commit blocked" >&2; exit 1
-  }
+  fi
   if ! curl -fsSL --retry 2 -o "${ws_gitleaks_tmp}/${ws_gitleaks_tarball}" \
     "https://github.com/gitleaks/gitleaks/releases/download/v${ws_gitleaks_version}/${ws_gitleaks_tarball}"; then
     rm -rf "${ws_gitleaks_tmp}"; echo "pre-commit: gitleaks download failed; commit blocked" >&2; exit 1
@@ -40,8 +40,11 @@ if [ ! -x "${ws_gitleaks_bin}" ]; then
   fi
   rm -rf "${ws_gitleaks_tmp}"
 fi
-ws_gitleaks_log="$("${ws_gitleaks_bin}" git --pre-commit --staged --redact --verbose --no-banner --no-color 2>&1)" &&
-  ws_gitleaks_rc=0 || ws_gitleaks_rc=$?
+if ws_gitleaks_log="$("${ws_gitleaks_bin}" git --pre-commit --staged --redact --verbose --no-banner --no-color 2>&1)"; then
+  ws_gitleaks_rc=0
+else
+  ws_gitleaks_rc=$?
+fi
 printf '%s\n' "${ws_gitleaks_log}" >&2
 if [ "${ws_gitleaks_rc}" -ne 0 ]; then
   echo "pre-commit: gitleaks blocked this commit (exit ${ws_gitleaks_rc})" >&2; exit 1
