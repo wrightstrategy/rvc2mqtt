@@ -2,7 +2,7 @@
 # Phase 2.5: Production Deployment
 # Base: Python slim for smaller image size
 
-FROM python:3.15-slim@sha256:f48fda6d59b2b3437781d1c3ccf4aa0e26ae871de3cdd758b49ab45ee7291619 AS base
+FROM python:3.15-slim@sha256:94d3426f1def7db4a106a232ac121bfd975393e5dfd40a619b955fae45fe7913 AS base
 
 # Apply Debian security updates at build time. The digest above pins the exact
 # upstream base, but that base is rebuilt on Docker's cadence, not Debian's: a
